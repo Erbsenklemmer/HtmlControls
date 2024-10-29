@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertikaler Slider</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #slider {
+            width: 30px;
+            height: 330px;
+            background-color: #ddd;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        #thumb {
+            width: 100%;
+            height: 30px;
+            background-color: #007bff;
+            position: absolute;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        #position-display {
+            font-size: 20px;
+            margin-top: 20px;            
+        }
+    </style>
+</head>
+<body>
+
+<div id="slider">
+    <div id="thumb"></div>
+</div>
+<div id="position-display">Position: slider.position.y</div>
+
+<script>
+    const slider = document.getElementById('slider');
+    const thumb = document.getElementById('thumb');
+    
+    const posDisplay = document.getElementById('position-display');
+    
+
+    let isDragging = false;
+    stopDragging();
+
+    const updateThumbPosition = (event) => {
+        const sliderRect = slider.getBoundingClientRect();
+        let newY = event.clientY - sliderRect.top - thumb.clientHeight / 2;
+
+        // Begrenzungen
+        if (newY < 0) newY = 0;
+        if (newY > sliderRect.height - thumb.clientHeight) newY = sliderRect.height - thumb.clientHeight;
+
+        thumb.style.top = newY + 'px';
+        posDisplay.innerText = 'Position bla: ' + ((sliderRect.height - thumb.clientHeight) / 2 - newY);
+    };
+    
+    function stopDragging() {
+        const sliderRect = slider.getBoundingClientRect();       
+        let newY = (sliderRect.height - thumb.clientHeight) / 2;
+        
+        thumb.style.top = newY + 'px';
+        posDisplay.innerText = 'Position bla: ' + ((sliderRect.height - thumb.clientHeight) / 2 - newY);
+    };
+
+    thumb.addEventListener('mousedown', (event) => {
+        isDragging = true;
+        updateThumbPosition(event);
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        stopDragging();
+    });
+
+    document.addEventListener('mousemove', (event) => {
+        if (isDragging) {
+            updateThumbPosition(event);
+        }
+    });
+
+    thumb.addEventListener('touchstart', (event) => {
+        isDragging = true;
+        updateThumbPosition(event.touches[0]);
+    });
+
+    document.addEventListener('touchend', () => {
+        isDragging = false;
+        stopDragging();
+    });
+
+    document.addEventListener('touchmove', (event) => {
+        if (isDragging) {
+            updateThumbPosition(event.touches[0]);
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joystick2</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .joystick {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background-color: #ccc;
+            border-radius: 50%;
+            border: 5px solid #888;
+            overflow: hidden;
+        }
+
+        .stick {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #007BFF;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+        }
+        positionDisplay {
+            font-size: 20px;
+            margin-top: 20px;            
+        }
+    </style>
+</head>
+<body>
+
+<div class="joystick" id="joystick">
+    <div class="stick" id="stick"></div>
+</div>
+
+<script>
+    const joystick = document.getElementById('joystick');
+    const stick = document.getElementById('stick');
+    
+    const posDisplay = document.getElementById('positionDisplay');
+    
+    let isDragging = false;
+
+    stick.addEventListener('mousedown', (event) => {
+        isDragging = true;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        stick.style.left = '50%';
+        stick.style.top = '50%';
+    });
+
+    joystick.addEventListener('mousemove', (event) => {
+        if (!isDragging) return;
+
+        const rect = joystick.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left - rect.width / 2;
+        const offsetY = event.clientY - rect.top - rect.height / 2;
+
+        const radius = rect.width / 2 - stick.offsetWidth / 2;
+        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+        if (distance < radius) {
+            stick.style.left = `${50 + (offsetX / (rect.width / 2) * 50)}%`;
+            stick.style.top = `${50 + (offsetY / (rect.height / 2) * 50)}%`;
+        } else {
+            const angle = Math.atan2(offsetY, offsetX);
+            stick.style.left = `${50 + Math.cos(angle) * (radius / (rect.width / 2) * 50)}%`;
+            stick.style.top = `${50 + Math.sin(angle) * (radius / (rect.height / 2) * 50)}%`;
+        }
+        posDisplay.text = 'Position: ';// + '$(stick.style.left)';
+    });
+</script>
+
+</body>
+</html>

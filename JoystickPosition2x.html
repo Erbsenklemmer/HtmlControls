@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joystick Beispiel</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            gap: 100px; /* Abstand zwischen den Joysticks */
+        }
+
+        .joystick {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background-color: #ccc;
+            border-radius: 50%;
+            border: 5px solid #888;
+            overflow: hidden;
+        }
+
+        .stick {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #007BFF;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+        }
+
+        .position {
+            font-size: 18px;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <div class="joystick" id="joystick1">
+        <div class="stick" id="stick1"></div>
+    </div>
+    <div class="position" id="position1">Position: X: 0, Y: 0</div>
+</div>
+
+<div>
+    <div class="joystick" id="joystick2">
+        <div class="stick" id="stick2"></div>
+    </div>
+    <div class="position" id="position2">Position: X: 0, Y: 0</div>
+</div>
+
+<script>
+    function createJoystick(joystickId, stickId, positionId) {
+        const joystick = document.getElementById(joystickId);
+        const stick = document.getElementById(stickId);
+        const positionDisplay = document.getElementById(positionId);
+        
+        let isDragging = false;
+        
+        let x = 50;
+        let y = 50;
+
+        updatePosition(x, y);
+        
+        stick.addEventListener('mousedown', (event) => {
+            isDragging = true;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            //stick.style.left = '50%';
+            //stick.style.top = '50%';
+            x = 50;
+            y = 50;
+            updatePosition(x, y);
+        });
+
+        joystick.addEventListener('mousemove', (event) => {
+            if (!isDragging) return;
+
+            const rect = joystick.getBoundingClientRect();
+            const offsetX = event.clientX - rect.left - rect.width / 2;
+            const offsetY = event.clientY - rect.top - rect.height / 2;
+
+            const radius = rect.width / 2 - stick.offsetWidth / 2;
+            const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+            if (distance < radius) {
+                x = 50 + (offsetX / (rect.width / 2) * 50);
+                y = 50 + (offsetY / (rect.height / 2) * 50);
+                //stick.style.left = `${50 + (offsetX / (rect.width / 2) * 50)}%`;
+                //stick.style.top = `${50 + (offsetY / (rect.height / 2) * 50)}%`;
+            } else {
+                const angle = Math.atan2(offsetY, offsetX);
+                x = 50 + Math.cos(angle) * (radius / (rect.width / 2) * 50);
+                y = 50 + Math.sin(angle) * (radius / (rect.height / 2) * 50);
+                //stick.style.left = `${50 + Math.cos(angle) * (radius / (rect.width / 2) * 50)}%`;
+                //stick.style.top = `${50 + Math.sin(angle) * (radius / (rect.height / 2) * 50)}%`;
+            }
+            //stick.style.left = `${x}%`;
+            //stick.style.top = `${y}%`;
+
+            updatePosition(x, y);
+        });
+
+        function updatePosition(posX, posY) {
+            stick.style.left = `${posX}%`;
+            stick.style.top = `${posY}%`;
+
+            positionDisplay.textContent = `Position: X: ${Math.round(posX)}, Y: ${Math.round(posY)}`;
+            //console.log('ad');
+        }
+    }
+
+    createJoystick('joystick1', 'stick1', 'position1');
+    createJoystick('joystick2', 'stick2', 'position2');
+</script>
+
+</body>
+</html>
